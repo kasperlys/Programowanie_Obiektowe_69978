@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Programowanie_Obiektowe_69978": {
+      "commandName": "Project"
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    }
+  }
+}
