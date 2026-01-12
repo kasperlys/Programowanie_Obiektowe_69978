@@ -123,7 +123,7 @@ namespace DziedziczeniePolimorfizm
             piekarz.Pracuj();
 
             // 11. Próba utworzenia obiektu klasy abstrakcyjnej
-            // Pracownik pracownik = new Pracownik(); // ❌ Błąd kompilacji: nie można tworzyć instancji klasy abstrakcyjnej
+            // Pracownik pracownik = new Pracownik(); //Błąd kompilacji: nie można tworzyć instancji klasy abstrakcyjnej
 
             Console.WriteLine("\n=== KOLEJNOŚĆ KONSTRUKTORÓW ===");
             A a = new A();
