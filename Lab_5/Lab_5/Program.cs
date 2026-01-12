@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
@@ -16,7 +16,7 @@ class Program
 {
     static void Main()
     {
-        //Wywołuj tu te funkcje, które chcesz testować:
+        // Odkomentuj to, co chcesz sprawdzić:
         //WriteToFile();
         //ReadFromFile();
         //AppendToFile();
@@ -29,17 +29,18 @@ class Program
         //FilterIrisCsv();
     }
 
-    // ----------------------------- 2 -----------------------------
-    // Funkcja zapisująca wiele linii do pliku
+    // ===== ZAPIS DO PLIKU =====
     static void WriteToFile()
     {
         List<string> lines = new List<string>();
-        Console.WriteLine("Podaj tekst (wpisz 'stop', aby zakończyć):");
+        Console.WriteLine("Podaj tekst (stop kończy):");
 
         while (true)
         {
             string input = Console.ReadLine();
-            if (input.ToLower() == "stop") break;
+            if (input.ToLower() == "stop")
+                break;
+
             lines.Add(input);
         }
 
@@ -47,83 +48,104 @@ class Program
         Console.WriteLine("Zapisano do pliku output.txt");
     }
 
-    // ----------------------------- 3 -----------------------------
-    // Funkcja odczytująca plik linia po linii
+    // ===== ODCZYT Z PLIKU =====
     static void ReadFromFile()
     {
         if (!File.Exists("output.txt"))
         {
-            Console.WriteLine("Plik output.txt nie istnieje!");
+            Console.WriteLine("Plik output.txt nie istnieje");
             return;
         }
 
         foreach (string line in File.ReadLines("output.txt"))
-        {
             Console.WriteLine(line);
-        }
     }
 
-    // ----------------------------- 4 -----------------------------
-    // Dopisywanie nowych linii do pliku
+    // ===== DOPISYWANIE DO PLIKU =====
     static void AppendToFile()
     {
         Console.WriteLine("Podaj tekst do dopisania (stop kończy):");
 
-        using StreamWriter sw = new StreamWriter("output.txt", append: true);
+        using StreamWriter sw = new StreamWriter("output.txt", true);
 
         while (true)
         {
             string input = Console.ReadLine();
-            if (input.ToLower() == "stop") break;
+            if (input.ToLower() == "stop")
+                break;
+
             sw.WriteLine(input);
         }
 
-        Console.WriteLine("Dopisano dane do pliku output.txt");
+        Console.WriteLine("Dopisano dane do pliku");
     }
 
-    // ----------------------------- 6 -----------------------------
-    // Serializacja listy studentów do JSON
+    // ===== JSON – ZAPIS =====
     static void SerializeStudentsToJson()
     {
-        List<Student> students = new()
+        List<Student> students = new List<Student>
         {
-            new Student { Imie = "Jan", Nazwisko = "Kowalski", Oceny = new List<int>{5,4,3}},
-            new Student { Imie = "Anna", Nazwisko = "Nowak", Oceny = new List<int>{5,5,4}}
+            new Student
+            {
+                Imie = "Jan",
+                Nazwisko = "Kowalski",
+                Oceny = new List<int> { 5, 4, 3 }
+            },
+            new Student
+            {
+                Imie = "Anna",
+                Nazwisko = "Nowak",
+                Oceny = new List<int> { 5, 5, 4 }
+            }
         };
 
-        string json = JsonSerializer.Serialize(students, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText("students.json", json);
+        string json = JsonSerializer.Serialize(
+            students,
+            new JsonSerializerOptions { WriteIndented = true }
+        );
 
+        File.WriteAllText("students.json", json);
         Console.WriteLine("Zapisano students.json");
     }
 
-    // ----------------------------- 7 -----------------------------
-    // Deserializacja studentów z JSON
+    // ===== JSON – ODCZYT =====
     static void DeserializeStudentsFromJson()
     {
         if (!File.Exists("students.json"))
         {
-            Console.WriteLine("Brak pliku students.json!");
+            Console.WriteLine("Brak pliku students.json");
             return;
         }
 
         string json = File.ReadAllText("students.json");
-        var students = JsonSerializer.Deserialize<List<Student>>(json);
+        List<Student> students = JsonSerializer.Deserialize<List<Student>>(json);
 
         foreach (var s in students)
         {
-            Console.WriteLine($"{s.Imie} {s.Nazwisko}: {string.Join(", ", s.Oceny)}");
+            Console.WriteLine(
+                s.Imie + " " + s.Nazwisko + ": " +
+                string.Join(", ", s.Oceny)
+            );
         }
     }
 
-    // ----------------------------- 8 -----------------------------
-    // Serializacja listy studentów do XML
+    // ===== XML – ZAPIS =====
     static void SerializeStudentsToXml()
     {
-        List<Student> students = new()
+        List<Student> students = new List<Student>
         {
-            new Student { Imie = "Adam", Nazwisko = "Zieliński", Oceny = new List<int>{3,4,5}},
-            new Student { Imie = "Kasia", Nazwisko = "Wiśniewska", Oceny = new List<int>{5,5,5}}
+            new Student
+            {
+                Imie = "Adam",
+                Nazwisko = "Zieliński",
+                Oceny = new List<int> { 3, 4, 5 }
+            },
+            new Student
+            {
+                Imie = "Kasia",
+                Nazwisko = "Wiśniewska",
+                Oceny = new List<int> { 5, 5, 5 }
+            }
         };
 
         XmlSerializer serializer = new XmlSerializer(typeof(List<Student>));
@@ -133,102 +155,107 @@ class Program
         Console.WriteLine("Zapisano students.xml");
     }
 
-    // ----------------------------- 9 -----------------------------
-    // Deserializacja studentów z XML
+    // ===== XML – ODCZYT =====
     static void DeserializeStudentsFromXml()
     {
         if (!File.Exists("students.xml"))
         {
-            Console.WriteLine("Brak pliku students.xml!");
+            Console.WriteLine("Brak pliku students.xml");
             return;
         }
 
         XmlSerializer serializer = new XmlSerializer(typeof(List<Student>));
         using FileStream fs = new FileStream("students.xml", FileMode.Open);
-        var students = (List<Student>)serializer.Deserialize(fs);
+        List<Student> students = (List<Student>)serializer.Deserialize(fs);
 
         foreach (var s in students)
         {
-            Console.WriteLine($"{s.Imie} {s.Nazwisko}: {string.Join(", ", s.Oceny)}");
+            Console.WriteLine(
+                s.Imie + " " + s.Nazwisko + ": " +
+                string.Join(", ", s.Oceny)
+            );
         }
     }
 
-    // ----------------------------- 10 -----------------------------
-    // Odczyt pliku CSV linia po linii
+    // ===== CSV – ODCZYT =====
     static void ReadCsvFile()
     {
         string path = "iris.csv";
+
         if (!File.Exists(path))
         {
-            Console.WriteLine("Brak pliku iris.csv!");
+            Console.WriteLine("Brak pliku iris.csv");
             return;
         }
 
         foreach (string line in File.ReadLines(path))
-        {
             Console.WriteLine(line);
-        }
     }
 
-    // ----------------------------- 11 -----------------------------
-    // Odczyt CSV i obliczenie średnich wartości numerycznych kolumn
+    // ===== CSV – ŚREDNIE =====
     static void ReadCsvAndCalculateAverages()
     {
         string path = "iris.csv";
+
         if (!File.Exists(path))
         {
-            Console.WriteLine("Brak pliku iris.csv!");
+            Console.WriteLine("Brak pliku iris.csv");
             return;
         }
 
-        var lines = File.ReadAllLines(path).ToList();
-        var header = lines[0].Split(',');
+        List<string> lines = File.ReadAllLines(path).ToList();
+        string[] header = lines[0].Split(',');
 
-        // Kolumny numeryczne: 4 pierwsze
         double[] sums = new double[4];
         int count = 0;
 
-        foreach (var line in lines.Skip(1))
+        foreach (string line in lines.Skip(1))
         {
-            var parts = line.Split(',');
+            string[] parts = line.Split(',');
             for (int i = 0; i < 4; i++)
                 sums[i] += double.Parse(parts[i]);
+
             count++;
         }
 
-        Console.WriteLine("Średnie wartości kolumn:");
+        Console.WriteLine("Średnie kolumn:");
         for (int i = 0; i < 4; i++)
-            Console.WriteLine($"{header[i]}: {sums[i] / count:F3}");
+            Console.WriteLine(header[i] + ": " + (sums[i] / count));
     }
 
-    // ----------------------------- 12 -----------------------------
-    // Filtrowanie pliku iris.csv i zapis do iris_filtered.csv
+    // ===== CSV – FILTROWANIE =====
     static void FilterIrisCsv()
     {
         string path = "iris.csv";
+
         if (!File.Exists(path))
         {
-            Console.WriteLine("Brak pliku iris.csv!");
+            Console.WriteLine("Brak pliku iris.csv");
             return;
         }
 
-        var lines = File.ReadAllLines(path);
-        var header = lines[0].Split(',');
+        string[] lines = File.ReadAllLines(path);
+        string[] header = lines[0].Split(',');
+
         int idxLength = Array.IndexOf(header, "sepal length");
         int idxWidth = Array.IndexOf(header, "sepal width");
         int idxClass = Array.IndexOf(header, "class");
 
-        List<string> filtered = new();
+        List<string> filtered = new List<string>();
         filtered.Add("sepal length,sepal width,class");
 
-        foreach (var line in lines.Skip(1))
+        foreach (string line in lines.Skip(1))
         {
-            var p = line.Split(',');
-            double sepalLength = double.Parse(p[idxLength]);
+            string[] p = line.Split(',');
+            double length = double.Parse(p[idxLength]);
 
-            if (sepalLength < 5)
+            if (length < 5)
             {
-                filtered.Add($"{p[idxLength]},{p[idxWidth]},{p[idxClass]}");
+                filtered.Add(
+                    p[idxLength] + "," +
+                    p[idxWidth] + "," +
+                    p[idxClass]
+                );
             }
         }
 
