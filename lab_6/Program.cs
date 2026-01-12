@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 
@@ -150,12 +150,29 @@ public class Program
     // Zadanie 7
     static void DodajStudenta(SqlConnection connection, Student student)
     {
+        // Sprawdzenie czy student już istnieje
+        string checkSql = "SELECT COUNT(*) FROM student WHERE imie = @imie AND nazwisko = @nazwisko";
+        using SqlCommand checkCmd = new(checkSql, connection);
+        checkCmd.Parameters.AddWithValue("@imie", student.Imie);
+        checkCmd.Parameters.AddWithValue("@nazwisko", student.Nazwisko);
+
+        int count = (int)checkCmd.ExecuteScalar()!;
+        if (count > 0)
+        {
+            Console.WriteLine("Student już istnieje. Nie dodano ponownie.");
+            return;
+        }
+
+        // Dodawanie studenta
         string sql = "INSERT INTO student(imie, nazwisko) VALUES (@imie, @nazwisko)";
         using SqlCommand cmd = new(sql, connection);
         cmd.Parameters.AddWithValue("@imie", student.Imie);
         cmd.Parameters.AddWithValue("@nazwisko", student.Nazwisko);
         cmd.ExecuteNonQuery();
+
+        Console.WriteLine("Dodano nowego studenta.");
     }
+
 
     // Zadanie 8
     static bool CzyPoprawnaOcena(double ocena)
@@ -171,15 +188,34 @@ public class Program
         if (!CzyPoprawnaOcena(ocena.Wartosc))
             throw new ArgumentException("Niepoprawna wartość oceny");
 
+        // Sprawdzenie czy taka ocena już istnieje
+        string checkSql = @"SELECT COUNT(*) FROM ocena 
+                        WHERE student_id = @student_id AND przedmiot = @przedmiot AND wartosc = @wartosc";
+        using SqlCommand checkCmd = new(checkSql, connection);
+        checkCmd.Parameters.AddWithValue("@student_id", ocena.StudentId);
+        checkCmd.Parameters.AddWithValue("@przedmiot", ocena.Przedmiot);
+        checkCmd.Parameters.AddWithValue("@wartosc", ocena.Wartosc);
+
+        int count = (int)checkCmd.ExecuteScalar()!;
+        if (count > 0)
+        {
+            Console.WriteLine("Taka ocena już istnieje. Nie dodano ponownie.");
+            return;
+        }
+
+        // Dodawanie oceny
         string sql = @"INSERT INTO ocena(wartosc, przedmiot, student_id)
-                       VALUES (@wartosc, @przedmiot, @student_id)";
+                   VALUES (@wartosc, @przedmiot, @student_id)";
 
         using SqlCommand cmd = new(sql, connection);
         cmd.Parameters.AddWithValue("@wartosc", ocena.Wartosc);
         cmd.Parameters.AddWithValue("@przedmiot", ocena.Przedmiot);
         cmd.Parameters.AddWithValue("@student_id", ocena.StudentId);
         cmd.ExecuteNonQuery();
+
+        Console.WriteLine("Dodano nową ocenę.");
     }
+
 
     // Zadanie 9
     static void UsunOcenyZGeografii(SqlConnection connection)
