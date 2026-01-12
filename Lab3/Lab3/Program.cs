@@ -1,152 +1,117 @@
-﻿using System;
+using System;
 
 namespace ComplexNumbersApp
 {
-    // 2. Interfejs IModular
+    // Interfejs – wszystko co ma moduł
     public interface IModular
     {
         double Module();
     }
 
-    // 1. Klasa ComplexNumber
+    // Liczba zespolona
     public class ComplexNumber : ICloneable, IEquatable<ComplexNumber>, IModular
     {
-        // Prywatne pola
         private double re;
         private double im;
 
-        // Publiczne właściwości
         public double Re
         {
-            get { return re; }
-            set { re = value; }
+            get => re;
+            set => re = value;
         }
 
         public double Im
         {
-            get { return im; }
-            set { im = value; }
+            get => im;
+            set => im = value;
         }
 
-        // Konstruktor
         public ComplexNumber(double re, double im)
         {
             this.re = re;
             this.im = im;
         }
 
-        // Przeciążenie ToString()
         public override string ToString()
         {
-            string sign = im >= 0 ? "+" : "-";
-            return $"{re} {sign} {Math.Abs(im)}i";
+            string znak = im >= 0 ? "+" : "-";
+            return $"{re} {znak} {Math.Abs(im)}i";
         }
 
-        // Operator +
+        // Dodawanie
         public static ComplexNumber operator +(ComplexNumber a, ComplexNumber b)
-        {
-            return new ComplexNumber(a.re + b.re, a.im + b.im);
-        }
+            => new(a.re + b.re, a.im + b.im);
 
-        // Operator -
+        // Odejmowanie
         public static ComplexNumber operator -(ComplexNumber a, ComplexNumber b)
-        {
-            return new ComplexNumber(a.re - b.re, a.im - b.im);
-        }
+            => new(a.re - b.re, a.im - b.im);
 
-        // Operator *
+        // Mnożenie
         public static ComplexNumber operator *(ComplexNumber a, ComplexNumber b)
-        {
-            double realPart = a.re * b.re - a.im * b.im;
-            double imagPart = a.re * b.im + a.im * b.re;
-            return new ComplexNumber(realPart, imagPart);
-        }
+            => new(
+                a.re * b.re - a.im * b.im,
+                a.re * b.im + a.im * b.re
+            );
 
-        // Operator sprzężenia (unarne -)
-        public static ComplexNumber operator -(ComplexNumber a)
-        {
-            return new ComplexNumber(a.re, -a.im);
-        }
+        // Sprzężenie
+        public static ComplexNumber operator -(ComplexNumber z)
+            => new(z.re, -z.im);
 
-        // Implementacja interfejsu ICloneable
+        // Kopia obiektu
         public object Clone()
-        {
-            return new ComplexNumber(this.re, this.im);
-        }
+            => new ComplexNumber(re, im);
 
-        // Implementacja interfejsu IEquatable
+        // Porównanie wartości
         public bool Equals(ComplexNumber other)
         {
-            if (other is null)
-                return false;
-            return this.re == other.re && this.im == other.im;
+            if (other is null) return false;
+            return re == other.re && im == other.im;
         }
 
-        // Przeciążenie Equals(object)
         public override bool Equals(object obj)
-        {
-            if (obj is ComplexNumber)
-                return Equals((ComplexNumber)obj);
-            return false;
-        }
+            => obj is ComplexNumber z && Equals(z);
 
-        // GetHashCode() – dobra praktyka przy porównywaniu obiektów
         public override int GetHashCode()
-        {
-            return re.GetHashCode() ^ im.GetHashCode();
-        }
+            => HashCode.Combine(re, im);
 
-        // Operatory == oraz !=
         public static bool operator ==(ComplexNumber a, ComplexNumber b)
         {
-            if (ReferenceEquals(a, b))
-                return true;
-            if (a is null || b is null)
-                return false;
+            if (ReferenceEquals(a, b)) return true;
+            if (a is null || b is null) return false;
             return a.Equals(b);
         }
 
         public static bool operator !=(ComplexNumber a, ComplexNumber b)
-        {
-            return !(a == b);
-        }
+            => !(a == b);
 
-        // 3. Implementacja IModular
+        // Moduł liczby zespolonej
         public double Module()
-        {
-            return Math.Sqrt(re * re + im * im);
-        }
+            => Math.Sqrt(re * re + im * im);
     }
 
-    // 4. Klasa Program z metodą Main()
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            ComplexNumber z1 = new ComplexNumber(3, 4);
-            ComplexNumber z2 = new ComplexNumber(1, -2);
+            var z1 = new ComplexNumber(3, 4);
+            var z2 = new ComplexNumber(1, -2);
 
+            Console.WriteLine("Liczby:");
             Console.WriteLine($"z1 = {z1}");
-            Console.WriteLine($"z2 = {z2}");
-            Console.WriteLine();
+            Console.WriteLine($"z2 = {z2}\n");
 
-            // Test operatorów
+            Console.WriteLine("Operacje:");
             Console.WriteLine($"z1 + z2 = {z1 + z2}");
             Console.WriteLine($"z1 - z2 = {z1 - z2}");
             Console.WriteLine($"z1 * z2 = {z1 * z2}");
-            Console.WriteLine($"Sprzężenie z1 = {-z1}");
-            Console.WriteLine();
+            Console.WriteLine($"Sprzężenie z1 = {-z1}\n");
 
-            // Test ICloneable
-            ComplexNumber z3 = (ComplexNumber)z1.Clone();
-            Console.WriteLine($"Kopia z1: {z3}");
+            var kopia = (ComplexNumber)z1.Clone();
+            Console.WriteLine("Porównania:");
+            Console.WriteLine($"z1 == kopia ? {z1 == kopia}");
+            Console.WriteLine($"z1 == z2 ? {z1 == z2}\n");
 
-            // Test porównania
-            Console.WriteLine($"z1 == z3 ? {z1 == z3}");
-            Console.WriteLine($"z1 == z2 ? {z1 == z2}");
-            Console.WriteLine();
-
-            // Test modułu
+            Console.WriteLine("Moduły:");
             Console.WriteLine($"|z1| = {z1.Module():F2}");
             Console.WriteLine($"|z2| = {z2.Module():F2}");
         }
